@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mermaid Flowchart Generator</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: false });
+    window.mermaid = mermaid;
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f3f3;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    textarea, button {
+      width: 100%;
+      margin-top: 1rem;
+    }
+    textarea {
+      height: 100px;
+      padding: 10px;
+    }
+    button {
+      padding: 10px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+    }
+    #output {
+      margin-top: 2rem;
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🛠️ Idea Generator</h2>
+  <p>Enter a task description to generate a flowchart:</p>
+  <textarea id="taskInput" placeholder="e.g. On Christmas, get money and go shopping..."></textarea>
+  <button onclick="generateFlowchart()">Generate Flowchart</button>
+
+  <div id="output">
+    <div id="mermaidChart">Your chart will appear here...</div>
+  </div>
+
+  <script>
+    async function generateFlowchart() {
+      const task = document.getElementById('taskInput').value;
+      const response = await fetch('http://localhost:8000/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: task })
+      });
+
+      const data = await response.json();
+      const code = data.code;
+
+      if (code) {
+        document.getElementById('mermaidChart').innerHTML = `<pre class="mermaid">${code}</pre>`;
+        mermaid.init(undefined, "#mermaidChart");
+      } else {
+        document.getElementById('mermaidChart').innerText = "Error generating flowchart.";
+      }
+    }
+  </script>
+
+</body>
+</html>
